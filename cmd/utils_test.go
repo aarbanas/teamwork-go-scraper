@@ -24,11 +24,6 @@ func TestValidateAction(t *testing.T) {
 	}
 }
 
-// func validateDate(date *string) bool {
-// 	_, err := time.Parse(YYYYMMDD, *date)
-// 	return err == nil
-// }
-
 func TestValidateDate(t *testing.T) {
 	tests := []struct {
 		name    string
