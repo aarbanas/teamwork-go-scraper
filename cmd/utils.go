@@ -50,3 +50,23 @@ func getDefaultDates() (string, string) {
 
 	return firstOfMonth.Format(YYYYMMDD), now.Format(YYYYMMDD)
 }
+
+func convertStringFormatToDate(dateString string) time.Time {
+	date, err := time.Parse(YYYYMMDD, dateString)
+	if err != nil {
+		fmt.Println("Failed to parse date:", err)
+		os.Exit(1)
+	}
+
+	return date
+}
+
+func getWorkingDays(startDate, endDate time.Time) *[]time.Time {
+	var workdays []time.Time
+	for d := startDate; d.Before(endDate); d = d.AddDate(0, 0, 1) {
+		if d.Weekday() != time.Saturday && d.Weekday() != time.Sunday {
+			workdays = append(workdays, d)
+		}
+	}
+	return &workdays
+}

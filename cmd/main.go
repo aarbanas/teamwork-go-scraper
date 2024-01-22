@@ -55,6 +55,9 @@ func main() {
 
 		fmt.Println("Enter description: ")
 		fmt.Scan(&description)
+
+		workDays := getWorkingDays(convertStringFormatToDate(*startDate), convertStringFormatToDate(*endDate))
+		fmt.Println(*workDays)
 	} else {
 		fmt.Println("Wrong action type selected. Needs to be \"read\" or \"log\"")
 	}
