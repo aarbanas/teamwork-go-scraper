@@ -51,14 +51,14 @@ func getDefaultDates() (string, string) {
 	return firstOfMonth.Format(YYYYMMDD), now.Format(YYYYMMDD)
 }
 
-func convertStringFormatToDate(dateString string) time.Time {
+func convertStringFormatToDate(dateString string) (time.Time, error) {
 	date, err := time.Parse(YYYYMMDD, dateString)
 	if err != nil {
 		fmt.Println("Failed to parse date:", err)
-		os.Exit(1)
+		return time.Time{}, err
 	}
 
-	return date
+	return date, nil
 }
 
 func getWorkingDays(startDate, endDate time.Time) *[]time.Time {
