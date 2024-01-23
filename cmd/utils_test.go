@@ -68,6 +68,16 @@ func TestConvertStringFormatToDate(t *testing.T) {
 	}
 }
 
+func TestConvertDateToStringFormat(t *testing.T) {
+	date := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	stringFormatValue := "2024-01-01"
+
+	stringDate := convertDateToString(date)
+	if stringDate != stringFormatValue {
+		t.Errorf("Invalid date value, got: %s, want: %s", stringDate, stringFormatValue)
+	}
+}
+
 func TestGetWorkingDays(t *testing.T) {
 	startDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2024, 1, 8, 0, 0, 0, 0, time.UTC)
