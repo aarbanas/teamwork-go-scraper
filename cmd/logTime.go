@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 )
 
 type LogTimeMetaData struct {
@@ -11,6 +13,14 @@ type LogTimeMetaData struct {
 	hours       int16
 	minutes     int16
 	description string
+}
+
+type TimeLog struct {
+	userId          int
+	date            string
+	time            string
+	isBillable      bool
+	logTimeMetaData *LogTimeMetaData
 }
 
 func prepareData() (*LogTimeMetaData, error) {
@@ -39,13 +49,22 @@ func prepareData() (*LogTimeMetaData, error) {
 	return &LogTimeMetaData{taskId: taskId, hours: hours, minutes: minutes, description: description}, nil
 }
 
+func prepareDataForRequest(workDays *[]time.Time, logMetadata *LogTimeMetaData) *[]TimeLog {
+	var timeLogs []TimeLog
+	TIME := "09:00:00"
+	userId, _ := strconv.Atoi(os.Getenv("USER_ID"))
+	for _, workDay := range *workDays {
+		timeLogs = append(timeLogs, TimeLog{userId: userId, date: convertDateToString(workDay), time: TIME, isBillable: true, logTimeMetaData: logMetadata})
+	}
+
+	return &timeLogs
+}
+
 func logHours(startDate *string, endDate *string) {
 	logMetadata, prepareDateErr := prepareData()
 	if prepareDateErr != nil {
 		fmt.Printf("Error: %s", prepareDateErr)
 	}
-
-	fmt.Printf("Log metadata %v", logMetadata.description)
 
 	workingStartDate, err := convertStringFormatToDate(*startDate)
 	workingEndDate, _err := convertStringFormatToDate(*endDate)
@@ -54,5 +73,11 @@ func logHours(startDate *string, endDate *string) {
 	}
 
 	workDays := getWorkingDays(workingStartDate, workingEndDate)
-	fmt.Println(*workDays)
+	if len(*workDays) < 1 {
+		fmt.Println("There are no workdays in selected period")
+		os.Exit(1)
+	}
+
+	timeLogs := prepareDataForRequest(workDays, logMetadata)
+	fmt.Println(timeLogs)
 }
