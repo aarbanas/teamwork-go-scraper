@@ -61,6 +61,10 @@ func convertStringFormatToDate(dateString string) (time.Time, error) {
 	return date, nil
 }
 
+func convertDateToString(date time.Time) string {
+	return date.Format(YYYYMMDD)
+}
+
 func getWorkingDays(startDate, endDate time.Time) *[]time.Time {
 	var workdays []time.Time
 	for d := startDate; d.Before(endDate); d = d.AddDate(0, 0, 1) {
