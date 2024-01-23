@@ -79,5 +79,16 @@ func logHours(startDate *string, endDate *string) {
 	}
 
 	timeLogs := prepareDataForRequest(workDays, logMetadata)
-	fmt.Println(timeLogs)
+	if len(*timeLogs) < 1 {
+		fmt.Println("There are no time logs")
+		os.Exit(1)
+	}
+
+	for _, timeLog := range *timeLogs {
+		_, errResponse := postTimeLogs(&timeLog)
+		if errResponse != nil {
+			fmt.Printf("Error sending request for date: %s", timeLog.date)
+			fmt.Printf("Error %v", errResponse)
+		}
+	}
 }
