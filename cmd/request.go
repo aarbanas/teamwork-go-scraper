@@ -82,9 +82,7 @@ func getTimeLogs(startDate *string, endDate *string) (*Response, error) {
 	}
 
 	// URL
-	url := fmt.Sprintf(
-		"%s?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true",
-		envVariables.TeamworkUrl, envVariables.UserId, *startDate, *endDate)
+	url := fmt.Sprintf("%s?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", envVariables.TeamworkUrl, envVariables.UserId, *startDate, *endDate)
 
 	// Create a new request with GET method
 	req, err := http.NewRequest("GET", url, nil)
