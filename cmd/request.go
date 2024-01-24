@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"time"
 )
 
 type Tag struct {
@@ -21,43 +20,9 @@ type Tag struct {
 
 type Response struct {
 	TimeEntries []struct {
-		AvatarURL           string    `json:"avatarUrl"`
-		CanEdit             bool      `json:"canEdit"`
-		CompanyID           int       `json:"companyId"`
-		CompanyName         string    `json:"companyName"`
-		CreatedAt           time.Time `json:"createdAt"`
-		Date                time.Time `json:"date"`
-		DateUserPerspective time.Time `json:"dateUserPerspective"`
-		Description         string    `json:"description"`
-		HasStartTime        bool      `json:"hasStartTime"`
-		Hours               int       `json:"hours"`
-		HoursDecimal        float64   `json:"hoursDecimal"`
-		ID                  int       `json:"id"`
-		InvoiceNo           any       `json:"invoiceNo"`
-		InvoiceStatus       any       `json:"invoiceStatus"`
-		IsBillable          bool      `json:"isBillable"`
-		IsBilled            bool      `json:"isBilled"`
-		Minutes             int       `json:"minutes"`
-		ParentTaskID        int       `json:"parentTaskId"`
-		ParentTaskName      any       `json:"parentTaskName"`
-		ProjectID           int       `json:"projectId"`
-		ProjectName         string    `json:"projectName"`
-		ProjectStatus       string    `json:"projectStatus"`
-		Tags                []Tag     `json:"tags"`
-		TaskEstimatedTime   int       `json:"taskEstimatedTime"`
-		TaskID              int       `json:"taskId"`
-		TaskIsPrivate       int       `json:"taskIsPrivate"`
-		TaskIsSubTask       bool      `json:"taskIsSubTask"`
-		TaskName            string    `json:"taskName"`
-		TaskTags            []any     `json:"taskTags"`
-		TasklistID          int       `json:"tasklistId"`
-		TasklistName        string    `json:"tasklistName"`
-		TicketID            any       `json:"ticketId"`
-		UpdatedDate         time.Time `json:"updatedDate"`
-		UserDeleted         bool      `json:"userDeleted"`
-		UserFirstName       string    `json:"userFirstName"`
-		UserID              int       `json:"userId"`
-		UserLastName        string    `json:"userLastName"`
+		HoursDecimal float64 `json:"hoursDecimal"`
+		ProjectID    int     `json:"projectId"`
+		Tags         []Tag   `json:"tags"`
 	} `json:"timeEntries"`
 }
 
