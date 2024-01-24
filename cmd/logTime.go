@@ -90,5 +90,7 @@ func logHours(startDate *string, endDate *string) {
 			fmt.Printf("Error sending request for date: %s", timeLog.date)
 			fmt.Printf("Error %v", errResponse)
 		}
+
+		fmt.Printf("Successfully logged time for date: %s\n", timeLog.date)
 	}
 }

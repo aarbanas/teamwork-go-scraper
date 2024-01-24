@@ -86,6 +86,48 @@ func prepareAuthHeader(token string) string {
 	return header
 }
 
+func handler(url string, requestMethod string, apiKey string, requestBody interface{}) (*[]byte, error) {
+	var req *http.Request
+	var httpNewRequestErr error
+
+	switch body := requestBody.(type) {
+	// Create a new request depending on the request body
+	case *bytes.Buffer:
+		req, httpNewRequestErr = http.NewRequest(requestMethod, url, body)
+	case nil:
+		req, httpNewRequestErr = http.NewRequest(requestMethod, url, nil)
+	default:
+		httpNewRequestErr = fmt.Errorf("body type not supported")
+	}
+
+	if httpNewRequestErr != nil {
+		return nil, httpNewRequestErr
+	}
+
+	token := prepareAuthHeader(apiKey)
+
+	// Add headers to the request
+	req.Header.Add("Authorization", token)
+	req.Header.Add("Content-Type", "application/json")
+
+	// Create a new HTTP client and execute the request
+	client := &http.Client{}
+	resp, clientErr := client.Do(req)
+	if clientErr != nil {
+		return nil, clientErr
+	}
+
+	defer resp.Body.Close()
+
+	// Read the response body
+	responseBody, ioReadAllErr := io.ReadAll(resp.Body)
+	if ioReadAllErr != nil {
+		return nil, ioReadAllErr
+	}
+
+	return &responseBody, nil
+}
+
 func getTimeLogs(startDate *string, endDate *string) (*Response, error) {
 
 	envVariables := getEnvVariables()
@@ -96,35 +138,13 @@ func getTimeLogs(startDate *string, endDate *string) (*Response, error) {
 	// URL
 	url := fmt.Sprintf("%s/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", envVariables.TeamworkUrl, envVariables.UserId, *startDate, *endDate)
 
-	// Create a new request with GET method
-	req, err := http.NewRequest("GET", url, nil)
-
-	if err != nil {
-		fmt.Printf("Error in NewRequest: %s", err)
-		return nil, err
+	responseBody, handlerErr := handler(url, "GET", envVariables.ApiKey, nil)
+	if handlerErr != nil {
+		fmt.Printf("Error in request handler: %s", handlerErr)
 	}
-
-	token := prepareAuthHeader(envVariables.ApiKey)
-
-	// Add headers to the request
-	req.Header.Add("Authorization", token)
-
-	// Create a new HTTP client and execute the request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		fmt.Printf("Error in client.Do: %s", err)
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	// Read the response body
-	body, _ := io.ReadAll(resp.Body)
 
 	var result Response
-	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
+	if err := json.Unmarshal(*responseBody, &result); err != nil { // Parse []byte to go struct pointer
 		fmt.Println("Can not unmarshal JSON")
 		os.Exit(1)
 	}
@@ -172,34 +192,15 @@ func postTimeLogs(timeLog *TimeLog) (bool, error) {
 		},
 	}
 
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return false, err
+	jsonData, jsonMarshalErr := json.Marshal(data)
+	if jsonMarshalErr != nil {
+		return false, jsonMarshalErr
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return false, err
-	}
-
-	token := prepareAuthHeader(envVariables.ApiKey)
-
-	req.Header.Add("Authorization", token)
-	req.Header.Add("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return false, err
-	}
-
-	defer resp.Body.Close()
-
-	body, _ := io.ReadAll(resp.Body)
-
-	var result Response
-	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
-		return false, err
+	_, handlerErr := handler(url, "POST", envVariables.ApiKey, bytes.NewBuffer(jsonData))
+	if handlerErr != nil {
+		fmt.Printf("Error in request handler: %s", handlerErr)
+		return false, handlerErr
 	}
 
 	return true, nil
