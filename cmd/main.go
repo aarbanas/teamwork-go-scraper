@@ -44,7 +44,10 @@ func main() {
 			break
 		}
 
-		fmt.Printf("Total overtime hours: %.1f\n", hours)
+		fmt.Println("\n*********************")
+		fmt.Printf("\nTotal hours by \"%s\" with value \"%s\" are: \"%.1f\"\n", *action, *value, hours)
+		fmt.Println("\n*********************")
+
 	} else if *actionType == "log" {
 		logHours(startDate, endDate)
 	} else {
