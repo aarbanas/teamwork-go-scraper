@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -74,6 +75,59 @@ func getEnvVariables() *Environment {
 	return &Environment{UserId: userId, ApiKey: apiKey, TeamworkUrl: teamworkUrl}
 }
 
+func prepareAuthHeader(token string) string {
+	// Convert string to bytes
+	dataBytes := []byte(token)
+
+	// Encode to base64
+	encodedData := base64.StdEncoding.EncodeToString(dataBytes)
+	header := fmt.Sprintf("Basic %s", encodedData)
+
+	return header
+}
+
+func handler(url string, requestMethod string, apiKey string, requestBody interface{}) (*[]byte, error) {
+	var req *http.Request
+	var httpNewRequestErr error
+
+	switch body := requestBody.(type) {
+	// Create a new request depending on the request body
+	case *bytes.Buffer:
+		req, httpNewRequestErr = http.NewRequest(requestMethod, url, body)
+	case nil:
+		req, httpNewRequestErr = http.NewRequest(requestMethod, url, nil)
+	default:
+		httpNewRequestErr = fmt.Errorf("body type not supported")
+	}
+
+	if httpNewRequestErr != nil {
+		return nil, httpNewRequestErr
+	}
+
+	token := prepareAuthHeader(apiKey)
+
+	// Add headers to the request
+	req.Header.Add("Authorization", token)
+	req.Header.Add("Content-Type", "application/json")
+
+	// Create a new HTTP client and execute the request
+	client := &http.Client{}
+	resp, clientErr := client.Do(req)
+	if clientErr != nil {
+		return nil, clientErr
+	}
+
+	defer resp.Body.Close()
+
+	// Read the response body
+	responseBody, ioReadAllErr := io.ReadAll(resp.Body)
+	if ioReadAllErr != nil {
+		return nil, ioReadAllErr
+	}
+
+	return &responseBody, nil
+}
+
 func getTimeLogs(startDate *string, endDate *string) (*Response, error) {
 
 	envVariables := getEnvVariables()
@@ -82,47 +136,72 @@ func getTimeLogs(startDate *string, endDate *string) (*Response, error) {
 	}
 
 	// URL
-	url := fmt.Sprintf(
-		"%s?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true",
-		envVariables.TeamworkUrl, envVariables.UserId, *startDate, *endDate)
+	url := fmt.Sprintf("%s/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", envVariables.TeamworkUrl, envVariables.UserId, *startDate, *endDate)
 
-	// Create a new request with GET method
-	req, err := http.NewRequest("GET", url, nil)
-
-	if err != nil {
-		fmt.Printf("Error in NewRequest: %s", err)
-		return nil, err
+	responseBody, handlerErr := handler(url, "GET", envVariables.ApiKey, nil)
+	if handlerErr != nil {
+		fmt.Printf("Error in request handler: %s", handlerErr)
 	}
-
-	// Convert string to bytes
-	dataBytes := []byte(envVariables.ApiKey)
-
-	// Encode to base64
-	encodedData := base64.StdEncoding.EncodeToString(dataBytes)
-	token := fmt.Sprintf("Basic %s", encodedData)
-
-	// Add headers to the request
-	req.Header.Add("Authorization", token)
-
-	// Create a new HTTP client and execute the request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		fmt.Printf("Error in client.Do: %s", err)
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	// Read the response body
-	body, _ := io.ReadAll(resp.Body)
 
 	var result Response
-	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
+	if err := json.Unmarshal(*responseBody, &result); err != nil { // Parse []byte to go struct pointer
 		fmt.Println("Can not unmarshal JSON")
 		os.Exit(1)
 	}
 
 	return &result, nil
+}
+
+func postTimeLogs(timeLog *TimeLog) (bool, error) {
+	envVariables := getEnvVariables()
+	if envVariables == nil {
+		return false, errors.New("Can't load environment variables")
+	}
+
+	// URL
+	url := fmt.Sprintf("%s/v3/tasks/%s/time.json", envVariables.TeamworkUrl, timeLog.logTimeMetaData.taskId)
+
+	// JSON body
+	data := struct {
+		TimeLog struct {
+			Hours       int16  `json:"hours"`
+			Minutes     int16  `json:"minutes"`
+			UserID      int    `json:"userId"`
+			Date        string `json:"date"`
+			Time        string `json:"time"`
+			Description string `json:"description"`
+			IsBillable  bool   `json:"isBillable"`
+		} `json:"timelog"`
+	}{
+		TimeLog: struct {
+			Hours       int16  `json:"hours"`
+			Minutes     int16  `json:"minutes"`
+			UserID      int    `json:"userId"`
+			Date        string `json:"date"`
+			Time        string `json:"time"`
+			Description string `json:"description"`
+			IsBillable  bool   `json:"isBillable"`
+		}{
+			Hours:       timeLog.logTimeMetaData.hours,
+			Minutes:     timeLog.logTimeMetaData.minutes,
+			UserID:      timeLog.userId,
+			Date:        timeLog.date,
+			Time:        timeLog.time,
+			Description: timeLog.logTimeMetaData.description,
+			IsBillable:  timeLog.isBillable,
+		},
+	}
+
+	jsonData, jsonMarshalErr := json.Marshal(data)
+	if jsonMarshalErr != nil {
+		return false, jsonMarshalErr
+	}
+
+	_, handlerErr := handler(url, "POST", envVariables.ApiKey, bytes.NewBuffer(jsonData))
+	if handlerErr != nil {
+		fmt.Printf("Error in request handler: %s", handlerErr)
+		return false, handlerErr
+	}
+
+	return true, nil
 }
