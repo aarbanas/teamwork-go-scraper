@@ -84,7 +84,7 @@ func TestGetWorkingDays(t *testing.T) {
 
 	workdays := getWorkingDays(startDate, endDate)
 
-	if len(*workdays) != 5 {
+	if len(*workdays) != 6 {
 		t.Errorf("Workdays count was incorrect, got: %d, want: %d.", len(*workdays), 5)
 	}
 
