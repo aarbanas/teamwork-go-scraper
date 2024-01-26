@@ -9,12 +9,13 @@ import (
 func main() {
 	defaultStartDate, defaultEndDate := getDefaultDates()
 
-	actionType := flag.String("actionType", "read", "The type of action to preform (read or log)")
-	projectMode := flag.Bool("p", false, "If selected hours will be logged by project")
 	action := flag.String("action", "tag", "Action on which hours will be calculated (tag or projectId)")
 	value := flag.String("value", "overtime", "Value for the specified action.")
 	startDate := flag.String("startDate", defaultStartDate, "Must be in format YYYY-MM-DD")
 	endDate := flag.String("endDate", defaultEndDate, "Must be in format YYYY-MM-DD")
+
+	log := flag.Bool("l", false, "Enter the logging mode (default: reading logged hours)")
+	projectMode := flag.Bool("p", false, "If selected hours will be logged by project id (default: log by task id )")
 
 	flag.Parse()
 
@@ -28,31 +29,29 @@ func main() {
 	}
 
 	hours := 0.0
-	if *actionType == "read" {
-		switch *action {
-		case "tag":
-			context := NewContext(&CalculateByTag{})
-			result := context.ExecuteStrategy(response, *value)
-			hours = result
-			break
-		case "projectId":
-			context := NewContext(&CalculateByProjectId{})
-			result := context.ExecuteStrategy(response, *value)
-			hours = result
-			break
-		default:
-			fmt.Println("Action not found")
-			break
-		}
-
-		fmt.Println("\n*********************")
-		fmt.Printf("\nTotal hours by \"%s\" with value \"%s\" are: \"%.1f\"\n", *action, *value, hours)
-		fmt.Println("\n*********************")
-
-	} else if *actionType == "log" {
+	if *log == true {
 		logHours(startDate, endDate, projectMode)
-	} else {
-		fmt.Println("Wrong action type selected. Needs to be \"read\" or \"log\"")
+		os.Exit(1)
 	}
+
+	switch *action {
+	case "tag":
+		context := NewContext(&CalculateByTag{})
+		result := context.ExecuteStrategy(response, *value)
+		hours = result
+		break
+	case "projectId":
+		context := NewContext(&CalculateByProjectId{})
+		result := context.ExecuteStrategy(response, *value)
+		hours = result
+		break
+	default:
+		fmt.Println("Action not found")
+		break
+	}
+
+	fmt.Println("\n*********************")
+	fmt.Printf("\nTotal hours by \"%s\" with value \"%s\" are: \"%.1f\"\n", *action, *value, hours)
+	fmt.Println("\n*********************")
 
 }

@@ -67,7 +67,7 @@ func convertDateToString(date time.Time) string {
 
 func getWorkingDays(startDate, endDate time.Time) *[]time.Time {
 	var workdays []time.Time
-	for d := startDate; d.Before(endDate); d = d.AddDate(0, 0, 1) {
+	for d := startDate; d.Before(endDate.AddDate(0, 0, 1)); d = d.AddDate(0, 0, 1) {
 		if d.Weekday() != time.Saturday && d.Weekday() != time.Sunday {
 			workdays = append(workdays, d)
 		}
