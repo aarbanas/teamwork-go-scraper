@@ -23,11 +23,16 @@ type TimeLog struct {
 	logTimeMetaData *LogTimeMetaData
 }
 
-func prepareData() (*LogTimeMetaData, error) {
+func prepareData(projectMode *bool) (*LogTimeMetaData, error) {
 	var taskId string
 	var hours int16
 	var minutes int16
-	fmt.Println("Enter TaskId: ")
+	hoursReference := "TaskId"
+	if *projectMode == true {
+		hoursReference = "ProjectId"
+	}
+
+	fmt.Printf("Enter %s: \n", hoursReference)
 	_, taskError := fmt.Scan(&taskId)
 	if taskError != nil {
 		return nil, taskError
@@ -60,8 +65,8 @@ func prepareDataForRequest(workDays *[]time.Time, logMetadata *LogTimeMetaData) 
 	return &timeLogs
 }
 
-func logHours(startDate *string, endDate *string) {
-	logMetadata, prepareDateErr := prepareData()
+func logHours(startDate *string, endDate *string, projectMode *bool) {
+	logMetadata, prepareDateErr := prepareData(projectMode)
 	if prepareDateErr != nil {
 		fmt.Printf("Error: %s", prepareDateErr)
 	}
@@ -85,7 +90,7 @@ func logHours(startDate *string, endDate *string) {
 	}
 
 	for _, timeLog := range *timeLogs {
-		_, errResponse := postTimeLogs(&timeLog)
+		_, errResponse := postTimeLogs(&timeLog, projectMode)
 		if errResponse != nil {
 			fmt.Printf("Error sending request for date: %s\n", timeLog.date)
 			fmt.Printf("Error %v", errResponse)
