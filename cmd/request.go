@@ -32,20 +32,6 @@ type LogResponse struct {
 	} `json:"timelog"`
 }
 
-type Environment struct {
-	UserId      string
-	ApiKey      string
-	TeamworkUrl string
-}
-
-func getEnvVariables() *Environment {
-	userId := os.Getenv("USER_ID")
-	apiKey := os.Getenv("API_KEY")
-	teamworkUrl := os.Getenv("URL")
-
-	return &Environment{UserId: userId, ApiKey: apiKey, TeamworkUrl: teamworkUrl}
-}
-
 func prepareAuthHeader(token string) string {
 	// Convert string to bytes
 	dataBytes := []byte(token)
@@ -99,17 +85,12 @@ func handler(url string, requestMethod string, apiKey string, requestBody interf
 	return &responseBody, nil
 }
 
-func getTimeLogs(startDate *string, endDate *string) (*Response, error) {
-
-	envVariables := getEnvVariables()
-	if envVariables == nil {
-		return nil, errors.New("Can't load environment variables")
-	}
+func getTimeLogs(startDate *string, endDate *string, configuration *Config) (*Response, error) {
 
 	// URL
-	url := fmt.Sprintf("%s/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", envVariables.TeamworkUrl, envVariables.UserId, *startDate, *endDate)
+	url := fmt.Sprintf("%s/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, configuration.UserId, *startDate, *endDate)
 
-	responseBody, handlerErr := handler(url, "GET", envVariables.ApiKey, nil)
+	responseBody, handlerErr := handler(url, "GET", configuration.ApiKey, nil)
 	if handlerErr != nil {
 		fmt.Printf("Error in request handler: %s", handlerErr)
 	}
@@ -123,19 +104,14 @@ func getTimeLogs(startDate *string, endDate *string) (*Response, error) {
 	return &result, nil
 }
 
-func postTimeLogs(timeLog *TimeLog, projectMode *bool) (bool, error) {
-	envVariables := getEnvVariables()
-	if envVariables == nil {
-		return false, errors.New("Can't load environment variables")
-	}
-
+func postTimeLogs(timeLog *TimeLog, projectMode *bool, configuration *Config) (bool, error) {
 	urlReference := "tasks"
 	if *projectMode == true {
 		urlReference = "projects"
 	}
 
 	// URL
-	url := fmt.Sprintf("%s/v3/%s/%s/time.json", envVariables.TeamworkUrl, urlReference, timeLog.logTimeMetaData.taskId)
+	url := fmt.Sprintf("%s/v3/%s/%s/time.json", configuration.Url, urlReference, timeLog.logTimeMetaData.taskId)
 
 	// JSON body
 	data := struct {
@@ -173,7 +149,7 @@ func postTimeLogs(timeLog *TimeLog, projectMode *bool) (bool, error) {
 		return false, jsonMarshalErr
 	}
 
-	res, handlerErr := handler(url, "POST", envVariables.ApiKey, bytes.NewBuffer(jsonData))
+	res, handlerErr := handler(url, "POST", configuration.ApiKey, bytes.NewBuffer(jsonData))
 	if handlerErr != nil {
 		fmt.Printf("Error in request handler: %s", handlerErr)
 		return false, handlerErr
