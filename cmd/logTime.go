@@ -54,10 +54,10 @@ func prepareData(projectMode *bool) (*LogTimeMetaData, error) {
 	return &LogTimeMetaData{taskId: taskId, hours: hours, minutes: minutes, description: description}, nil
 }
 
-func prepareDataForRequest(workDays *[]time.Time, logMetadata *LogTimeMetaData) *[]TimeLog {
+func prepareDataForRequest(workDays *[]time.Time, logMetadata *LogTimeMetaData, configuration *Config) *[]TimeLog {
 	var timeLogs []TimeLog
 	TIME := "09:00:00"
-	userId, _ := strconv.Atoi(os.Getenv("USER_ID"))
+	userId, _ := strconv.Atoi(configuration.UserId)
 	for _, workDay := range *workDays {
 		timeLogs = append(timeLogs, TimeLog{userId: userId, date: convertDateToString(workDay), time: TIME, isBillable: true, logTimeMetaData: logMetadata})
 	}
@@ -65,7 +65,7 @@ func prepareDataForRequest(workDays *[]time.Time, logMetadata *LogTimeMetaData) 
 	return &timeLogs
 }
 
-func logHours(startDate *string, endDate *string, projectMode *bool) {
+func logHours(startDate *string, endDate *string, projectMode *bool, configuration *Config) {
 	logMetadata, prepareDateErr := prepareData(projectMode)
 	if prepareDateErr != nil {
 		fmt.Printf("Error: %s", prepareDateErr)
@@ -83,14 +83,14 @@ func logHours(startDate *string, endDate *string, projectMode *bool) {
 		os.Exit(1)
 	}
 
-	timeLogs := prepareDataForRequest(workDays, logMetadata)
+	timeLogs := prepareDataForRequest(workDays, logMetadata, configuration)
 	if len(*timeLogs) < 1 {
 		fmt.Println("There are no time logs")
 		os.Exit(1)
 	}
 
 	for _, timeLog := range *timeLogs {
-		_, errResponse := postTimeLogs(&timeLog, projectMode)
+		_, errResponse := postTimeLogs(&timeLog, projectMode, configuration)
 		if errResponse != nil {
 			fmt.Printf("Error sending request for date: %s\n", timeLog.date)
 			fmt.Printf("Error %v", errResponse)

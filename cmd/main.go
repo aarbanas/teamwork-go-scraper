@@ -4,10 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 func main() {
 	defaultStartDate, defaultEndDate := getDefaultDates()
+	absPath, _ := filepath.Abs("config.json")
+	configuration := loadConfiguration(absPath)
 
 	action := flag.String("action", "tag", "Action on which hours will be calculated (tag or projectId)")
 	value := flag.String("value", "overtime", "Value for the specified action.")
@@ -22,18 +25,18 @@ func main() {
 	// Validate command-line arguments
 	validateInputParams(action, startDate, endDate)
 
+	if *log == true {
+		logHours(startDate, endDate, projectMode, &configuration)
+		os.Exit(1)
+	}
+
 	// Send request to Teamtailor
-	response, responseError := getTimeLogs(startDate, endDate)
+	response, responseError := getTimeLogs(startDate, endDate, &configuration)
 	if responseError != nil {
 		os.Exit(1)
 	}
 
 	hours := 0.0
-	if *log == true {
-		logHours(startDate, endDate, projectMode)
-		os.Exit(1)
-	}
-
 	switch *action {
 	case "tag":
 		context := NewContext(&CalculateByTag{})
