@@ -87,10 +87,10 @@ func logHours(startDate *string, endDate *string) {
 	for _, timeLog := range *timeLogs {
 		_, errResponse := postTimeLogs(&timeLog)
 		if errResponse != nil {
-			fmt.Printf("Error sending request for date: %s", timeLog.date)
+			fmt.Printf("Error sending request for date: %s\n", timeLog.date)
 			fmt.Printf("Error %v", errResponse)
+		} else {
+			fmt.Printf("Successfully logged time for date: %s\n", timeLog.date)
 		}
-
-		fmt.Printf("Successfully logged time for date: %s\n", timeLog.date)
 	}
 }
