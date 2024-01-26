@@ -26,6 +26,12 @@ type Response struct {
 	} `json:"timeEntries"`
 }
 
+type LogResponse struct {
+	TimeLog struct {
+		ID int `json:"id"`
+	} `json:"timelog"`
+}
+
 type Environment struct {
 	UserId      string
 	ApiKey      string
@@ -162,10 +168,19 @@ func postTimeLogs(timeLog *TimeLog) (bool, error) {
 		return false, jsonMarshalErr
 	}
 
-	_, handlerErr := handler(url, "POST", envVariables.ApiKey, bytes.NewBuffer(jsonData))
+	res, handlerErr := handler(url, "POST", envVariables.ApiKey, bytes.NewBuffer(jsonData))
 	if handlerErr != nil {
 		fmt.Printf("Error in request handler: %s", handlerErr)
 		return false, handlerErr
+	}
+
+	var result LogResponse
+	if err := json.Unmarshal(*res, &result); err != nil { // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+		os.Exit(1)
+	}
+	if result.TimeLog.ID == 0 {
+		return false, errors.New("Did not log time for selected date")
 	}
 
 	return true, nil
