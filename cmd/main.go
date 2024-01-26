@@ -10,6 +10,7 @@ func main() {
 	defaultStartDate, defaultEndDate := getDefaultDates()
 
 	actionType := flag.String("actionType", "read", "The type of action to preform (read or log)")
+	projectMode := flag.Bool("p", false, "If selected hours will be logged by project")
 	action := flag.String("action", "tag", "Action on which hours will be calculated (tag or projectId)")
 	value := flag.String("value", "overtime", "Value for the specified action.")
 	startDate := flag.String("startDate", defaultStartDate, "Must be in format YYYY-MM-DD")
@@ -49,7 +50,7 @@ func main() {
 		fmt.Println("\n*********************")
 
 	} else if *actionType == "log" {
-		logHours(startDate, endDate)
+		logHours(startDate, endDate, projectMode)
 	} else {
 		fmt.Println("Wrong action type selected. Needs to be \"read\" or \"log\"")
 	}

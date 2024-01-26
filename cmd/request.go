@@ -123,14 +123,19 @@ func getTimeLogs(startDate *string, endDate *string) (*Response, error) {
 	return &result, nil
 }
 
-func postTimeLogs(timeLog *TimeLog) (bool, error) {
+func postTimeLogs(timeLog *TimeLog, projectMode *bool) (bool, error) {
 	envVariables := getEnvVariables()
 	if envVariables == nil {
 		return false, errors.New("Can't load environment variables")
 	}
 
+	urlReference := "tasks"
+	if *projectMode == true {
+		urlReference = "projects"
+	}
+
 	// URL
-	url := fmt.Sprintf("%s/v3/tasks/%s/time.json", envVariables.TeamworkUrl, timeLog.logTimeMetaData.taskId)
+	url := fmt.Sprintf("%s/v3/%s/%s/time.json", envVariables.TeamworkUrl, urlReference, timeLog.logTimeMetaData.taskId)
 
 	// JSON body
 	data := struct {
