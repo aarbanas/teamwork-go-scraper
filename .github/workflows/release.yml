@@ -1,11 +1,9 @@
 name: Release Go project
 
-on:
-  release:
-    types: [created]
+on: workflow_call
 
 jobs:
-  build:
+  release:
     name: GoReleaser build
     runs-on: ubuntu-latest
 
