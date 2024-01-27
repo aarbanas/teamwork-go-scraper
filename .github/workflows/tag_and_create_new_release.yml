@@ -4,7 +4,8 @@ on:
     branches:
       - main
 jobs:
-  build:
+  tag-and-create-release:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
