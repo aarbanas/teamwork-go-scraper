@@ -20,5 +20,6 @@ jobs:
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
-      - name: Build go Release
-        uses: ./.github/workflows/release.yml
+  call-workflow-passing-data:
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
