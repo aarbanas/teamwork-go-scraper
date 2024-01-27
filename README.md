@@ -2,25 +2,31 @@
 
 Simple Go application for calculating hours logged and logging time in Teamwork.
 
-For building binary run:
+This app can be used without any dependencies.
+Download latest version from [releases](https://github.com/aarbanas/teamwork-go-scraper/releases) and add `config.json` (check the [config.json-example](https://github.com/aarbanas/teamwork-go-scraper/blob/main/config.json-example)) to the
+same directory where the downloaded binary file is. Than just run:
 
 ```bash
-$ go build -o bin/run ./cmd
-```
-
-Or use directly in terminal:
-
-```bash
-$ go run ./cmd
+$ ./teamwork-go-scraper
 ```
 
 For help run:
 
 ```bash
-$ go run ./cmd -help
+$ ./teamwork-go-scraper -help
 ```
 
-## Prerequisites
+# Table of Contents
+
+1. [Prerequisites Go users](#for-users-having-go-installed)
+2. [Usage](#usage)
+3. [Action](#action)
+4. [Value](#value)
+5. [Dates](#dates)
+6. [Logging hours](#log-mode)
+7. [Logging example](#example-for-logging-hours-january-2024)
+
+## For users having Go installed
 
 You must have a running go version locally [Go.dev](https://go.dev/doc/install).
 Run the next command to check if you have a running go version.
