@@ -1,10 +1,6 @@
 name: Release Go project
 
-on:
-  workflow_call:
-    secrets:
-      token:
-        required: true
+on: workflow_call
 
 jobs:
   release:
