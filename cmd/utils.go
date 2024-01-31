@@ -7,10 +7,6 @@ import (
 	"time"
 )
 
-const (
-	YYYYMMDD = "2006-01-02"
-)
-
 func validateAction(action *string) error {
 	if *action != "tag" && *action != "projectId" {
 		return errors.New(" Action must be \"tag\" or \"projectId")
@@ -20,7 +16,7 @@ func validateAction(action *string) error {
 }
 
 func validateDate(date *string) bool {
-	_, err := time.Parse(YYYYMMDD, *date)
+	_, err := time.Parse(time.DateOnly, *date)
 	return err == nil
 }
 
@@ -48,11 +44,11 @@ func getDefaultDates() (string, string) {
 
 	firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
 
-	return firstOfMonth.Format(YYYYMMDD), now.Format(YYYYMMDD)
+	return firstOfMonth.Format(time.DateOnly), now.Format(time.DateOnly)
 }
 
 func convertStringFormatToDate(dateString string) (time.Time, error) {
-	date, err := time.Parse(YYYYMMDD, dateString)
+	date, err := time.Parse(time.DateOnly, dateString)
 	if err != nil {
 		fmt.Println("Failed to parse date:", err)
 		return time.Time{}, err
@@ -62,7 +58,7 @@ func convertStringFormatToDate(dateString string) (time.Time, error) {
 }
 
 func convertDateToString(date time.Time) string {
-	return date.Format(YYYYMMDD)
+	return date.Format(time.DateOnly)
 }
 
 func getWorkingDays(startDate, endDate time.Time) *[]time.Time {
