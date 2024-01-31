@@ -42,6 +42,14 @@ Just follow the next steps.
 3. Export necessary environment variables (check `.config.json-example`)
    1. Get the `userId` from Teamwork
 
+## Installation
+
+To install the package just run:
+
+```bash
+go install github.com/aarbanas/teamwork-go-scraper/cmd@latest
+```
+
 ## Usage
 
 By default this application is going to calculate all overtime hours logged in teamwork. Here is a list of other options:
