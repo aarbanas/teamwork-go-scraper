@@ -106,7 +106,7 @@ func getTimeLogs(startDate *string, endDate *string, configuration *Config) (*Re
 
 func postTimeLogs(timeLog *TimeLog, projectMode *bool, configuration *Config) (bool, error) {
 	urlReference := "tasks"
-	if *projectMode == true {
+	if *projectMode {
 		urlReference = "projects"
 	}
 

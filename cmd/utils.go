@@ -30,12 +30,12 @@ func validateInputParams(action *string, startDate *string, endDate *string) {
 		os.Exit(1)
 	}
 
-	if err := validateDate(startDate); err != true {
+	if err := validateDate(startDate); !err {
 		fmt.Fprintf(os.Stderr, "error: Wrong startDate format!\n")
 		os.Exit(1)
 	}
 
-	if err := validateDate(endDate); err != true {
+	if err := validateDate(endDate); !err {
 		fmt.Fprintf(os.Stderr, "error: Wrong endDate format!\n")
 		os.Exit(1)
 	}

@@ -25,12 +25,12 @@ func main() {
 	// Validate command-line arguments
 	validateInputParams(action, startDate, endDate)
 
-	if *log == true {
+	if *log {
 		logHours(startDate, endDate, projectMode, &configuration)
 		os.Exit(1)
 	}
 
-	// Send request to Teamtailor
+	// Send request to Teamwork
 	response, responseError := getTimeLogs(startDate, endDate, &configuration)
 	if responseError != nil {
 		os.Exit(1)
@@ -42,15 +42,10 @@ func main() {
 		context := NewContext(&CalculateByTag{})
 		result := context.ExecuteStrategy(response, *value)
 		hours = result
-		break
 	case "projectId":
 		context := NewContext(&CalculateByProjectId{})
 		result := context.ExecuteStrategy(response, *value)
 		hours = result
-		break
-	default:
-		fmt.Println("Action not found")
-		break
 	}
 
 	fmt.Println("\n*********************")

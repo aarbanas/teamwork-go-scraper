@@ -28,7 +28,7 @@ func prepareData(projectMode *bool) (*LogTimeMetaData, error) {
 	var hours int16
 	var minutes int16
 	hoursReference := "TaskId"
-	if *projectMode == true {
+	if *projectMode {
 		hoursReference = "ProjectId"
 	}
 
