@@ -7,20 +7,20 @@ import (
 	"time"
 )
 
-func validateAction(action *string) error {
-	if *action != "tag" && *action != "projectId" {
+func validateAction(action string) error {
+	if action != "tag" && action != "projectId" {
 		return errors.New(" Action must be \"tag\" or \"projectId")
 	}
 
 	return nil
 }
 
-func validateDate(date *string) bool {
-	_, err := time.Parse(time.DateOnly, *date)
+func validateDate(date string) bool {
+	_, err := time.Parse(time.DateOnly, date)
 	return err == nil
 }
 
-func validateInputParams(action *string, startDate *string, endDate *string) {
+func validateInputParams(action string, startDate string, endDate string) {
 	if err := validateAction(action); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
@@ -61,12 +61,12 @@ func convertDateToString(date time.Time) string {
 	return date.Format(time.DateOnly)
 }
 
-func getWorkingDays(startDate, endDate time.Time) *[]time.Time {
+func getWorkingDays(startDate, endDate time.Time) []time.Time {
 	var workdays []time.Time
 	for d := startDate; d.Before(endDate.AddDate(0, 0, 1)); d = d.AddDate(0, 0, 1) {
 		if d.Weekday() != time.Saturday && d.Weekday() != time.Sunday {
 			workdays = append(workdays, d)
 		}
 	}
-	return &workdays
+	return workdays
 }

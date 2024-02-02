@@ -85,10 +85,10 @@ func handler(url string, requestMethod string, apiKey string, requestBody interf
 	return &responseBody, nil
 }
 
-func getTimeLogs(startDate *string, endDate *string, configuration *Config) (*Response, error) {
+func getTimeLogs(startDate string, endDate string, configuration Config) (*Response, error) {
 
 	// URL
-	url := fmt.Sprintf("%s/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, configuration.UserId, *startDate, *endDate)
+	url := fmt.Sprintf("%s/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, configuration.UserId, startDate, endDate)
 
 	responseBody, handlerErr := handler(url, "GET", configuration.ApiKey, nil)
 	if handlerErr != nil {
@@ -104,9 +104,9 @@ func getTimeLogs(startDate *string, endDate *string, configuration *Config) (*Re
 	return &result, nil
 }
 
-func postTimeLogs(timeLog *TimeLog, projectMode *bool, configuration *Config) (bool, error) {
+func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool, error) {
 	urlReference := "tasks"
-	if *projectMode {
+	if projectMode {
 		urlReference = "projects"
 	}
 

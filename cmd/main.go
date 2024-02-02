@@ -23,15 +23,15 @@ func main() {
 	flag.Parse()
 
 	// Validate command-line arguments
-	validateInputParams(action, startDate, endDate)
+	validateInputParams(*action, *startDate, *endDate)
 
 	if *log {
-		logHours(startDate, endDate, projectMode, &configuration)
+		logHours(*startDate, *endDate, *projectMode, configuration)
 		os.Exit(1)
 	}
 
 	// Send request to Teamwork
-	response, responseError := getTimeLogs(startDate, endDate, &configuration)
+	response, responseError := getTimeLogs(*startDate, *endDate, configuration)
 	if responseError != nil {
 		os.Exit(1)
 	}
@@ -49,7 +49,7 @@ func main() {
 	}
 
 	fmt.Println("\n*********************")
-	fmt.Printf("\nTotal hours by \"%s\" with value \"%s\" are: \"%.1f\"\n", *action, *value, hours)
+	fmt.Printf("\nTotal hours in period from %s to %s by \"%s\" with value \"%s\" are: \"%.1f\"\n", *startDate, *endDate, *action, *value, hours)
 	fmt.Println("\n*********************")
 
 }
