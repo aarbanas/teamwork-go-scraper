@@ -19,7 +19,7 @@ func TestValidateAction(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := validateAction(&test.action)
+			err := validateAction(test.action)
 			if (err != nil) != test.isErrorExpected {
 				t.Errorf("validateAction() error = %v, isErrorExpected %v", err, test.isErrorExpected)
 			}
@@ -40,7 +40,7 @@ func TestValidateDate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := validateDate(&test.date)
+			err := validateDate(test.date)
 			if err != test.isErrorExpected {
 				t.Errorf("validateDate() error = %v, isErrorExpected %v", err, test.isErrorExpected)
 			}
@@ -84,11 +84,11 @@ func TestGetWorkingDays(t *testing.T) {
 
 	workdays := getWorkingDays(startDate, endDate)
 
-	if len(*workdays) != 6 {
-		t.Errorf("Workdays count was incorrect, got: %d, want: %d.", len(*workdays), 5)
+	if len(workdays) != 6 {
+		t.Errorf("Workdays count was incorrect, got: %d, want: %d.", len(workdays), 5)
 	}
 
-	for _, d := range *workdays {
+	for _, d := range workdays {
 		if d.Weekday() == time.Saturday || d.Weekday() == time.Sunday {
 			t.Errorf("Workdays should not include weekend, but got: %s.", d.Weekday())
 		}
