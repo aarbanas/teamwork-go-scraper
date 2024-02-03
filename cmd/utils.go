@@ -70,3 +70,17 @@ func getWorkingDays(startDate, endDate time.Time) []time.Time {
 	}
 	return workdays
 }
+
+func removeNoneWorkingDays(workdays *[]time.Time, nonWorkingDays *CroatianNoneWorkingDays) {
+	if nonWorkingDays == nil {
+		return
+	}
+
+	for index, workday := range *workdays {
+		for _, nonWorkingDay := range *nonWorkingDays {
+			if workday.Format(time.DateOnly) == nonWorkingDay.StartDate {
+				*workdays = append((*workdays)[:index], (*workdays)[index+1:]...)
+			}
+		}
+	}
+}

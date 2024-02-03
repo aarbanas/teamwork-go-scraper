@@ -94,3 +94,28 @@ func TestGetWorkingDays(t *testing.T) {
 		}
 	}
 }
+
+func TestRemoveNonWorkingDays(t *testing.T) {
+	workdays := []time.Time{
+		time.Date(2023, 3, 12, 0, 0, 0, 0, time.UTC),
+		time.Date(2023, 3, 13, 0, 0, 0, 0, time.UTC),
+		time.Date(2023, 3, 14, 0, 0, 0, 0, time.UTC),
+		time.Date(2023, 3, 15, 0, 0, 0, 0, time.UTC),
+	}
+
+	var nonWorkingDays CroatianNoneWorkingDays
+	nonWorkingDays = append(nonWorkingDays, struct {
+		EndDate   string `json:"endDate"`
+		StartDate string `json:"startDate"`
+	}{
+		EndDate:   "2023-03-14",
+		StartDate: "2023-03-14",
+	})
+
+	// call the function
+	removeNoneWorkingDays(&workdays, &nonWorkingDays)
+
+	if len(workdays) != 3 {
+		t.Errorf("Expected 3 workdays left, but got %d", len(workdays))
+	}
+}

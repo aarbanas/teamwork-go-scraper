@@ -32,6 +32,11 @@ type LogResponse struct {
 	} `json:"timelog"`
 }
 
+type CroatianNoneWorkingDays []struct {
+	EndDate   string `json:"endDate"`
+	StartDate string `json:"startDate"`
+}
+
 func prepareAuthHeader(token string) string {
 	// Convert string to bytes
 	dataBytes := []byte(token)
@@ -45,41 +50,43 @@ func prepareAuthHeader(token string) string {
 
 func handler(url string, requestMethod string, apiKey string, requestBody interface{}) (*[]byte, error) {
 	var req *http.Request
-	var httpNewRequestErr error
+	var err error
 
 	switch body := requestBody.(type) {
 	// Create a new request depending on the request body
 	case *bytes.Buffer:
-		req, httpNewRequestErr = http.NewRequest(requestMethod, url, body)
+		req, err = http.NewRequest(requestMethod, url, body)
 	case nil:
-		req, httpNewRequestErr = http.NewRequest(requestMethod, url, nil)
+		req, err = http.NewRequest(requestMethod, url, nil)
 	default:
-		httpNewRequestErr = fmt.Errorf("body type not supported")
+		err = fmt.Errorf("body type not supported")
 	}
 
-	if httpNewRequestErr != nil {
-		return nil, httpNewRequestErr
+	if err != nil {
+		return nil, err
 	}
 
-	token := prepareAuthHeader(apiKey)
+	if apiKey != "" {
+		token := prepareAuthHeader(apiKey)
 
-	// Add headers to the request
-	req.Header.Add("Authorization", token)
-	req.Header.Add("Content-Type", "application/json")
+		// Add headers to the request
+		req.Header.Add("Authorization", token)
+		req.Header.Add("Content-Type", "application/json")
+	}
 
 	// Create a new HTTP client and execute the request
 	client := &http.Client{}
-	resp, clientErr := client.Do(req)
-	if clientErr != nil {
-		return nil, clientErr
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 
 	// Read the response body
-	responseBody, ioReadAllErr := io.ReadAll(resp.Body)
-	if ioReadAllErr != nil {
-		return nil, ioReadAllErr
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
 
 	return &responseBody, nil
@@ -90,9 +97,9 @@ func getTimeLogs(startDate string, endDate string, configuration Config) (*Respo
 	// URL
 	url := fmt.Sprintf("%s/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, configuration.UserId, startDate, endDate)
 
-	responseBody, handlerErr := handler(url, "GET", configuration.ApiKey, nil)
-	if handlerErr != nil {
-		fmt.Printf("Error in request handler: %s", handlerErr)
+	responseBody, err := handler(url, "GET", configuration.ApiKey, nil)
+	if err != nil {
+		fmt.Printf("Error in request handler: %s", err)
 	}
 
 	var result Response
@@ -144,15 +151,15 @@ func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool
 		},
 	}
 
-	jsonData, jsonMarshalErr := json.Marshal(data)
-	if jsonMarshalErr != nil {
-		return false, jsonMarshalErr
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return false, err
 	}
 
-	res, handlerErr := handler(url, "POST", configuration.ApiKey, bytes.NewBuffer(jsonData))
-	if handlerErr != nil {
-		fmt.Printf("Error in request handler: %s", handlerErr)
-		return false, handlerErr
+	res, err := handler(url, "POST", configuration.ApiKey, bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Printf("Error in request handler: %s", err)
+		return false, err
 	}
 
 	var result LogResponse
@@ -165,4 +172,21 @@ func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool
 	}
 
 	return true, nil
+}
+
+func getCroatianNoneWorkingDays(startDate, endDate string) (*CroatianNoneWorkingDays, error) {
+	url := fmt.Sprintf("https://openholidaysapi.org/PublicHolidays?countryIsoCode=HR&languageIsoCode=EN&validFrom=%s&validTo=%s", startDate, endDate)
+
+	responseBody, err := handler(url, "GET", "", nil)
+	if err != nil {
+		fmt.Printf("Error in request handler: %s", err)
+	}
+
+	var result CroatianNoneWorkingDays
+	if err := json.Unmarshal(*responseBody, &result); err != nil { // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+		os.Exit(1)
+	}
+
+	return &result, nil
 }
