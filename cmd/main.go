@@ -20,7 +20,7 @@ func main() {
 
 	log := flag.Bool("l", false, "Enter the logging mode (default: reading logged hours)")
 	projectMode := flag.Bool("p", false, "If selected hours will be logged by project id (default: log by task id )")
-	includeCroatianHolidays := flag.Bool("h", true, "Use for excluding Croatian national holidays from calculations")
+	includeCroatianHolidays := flag.Bool("h", false, "Use for including Croatian national holidays in the calculations")
 	checkMissingHours := flag.Bool("c", false, "Use for checking if there are some days where hours are not logged")
 
 	flag.Parse()

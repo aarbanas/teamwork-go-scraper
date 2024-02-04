@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type MissingHours struct {
+type DayHours struct {
 	Date         time.Time
 	HoursDecimal float64
 }
@@ -15,33 +15,61 @@ var (
 	minimumWorkingHours = 7.5
 )
 
-func ValidateMissingHours(loggedHours Response, includeCroHolidays bool, startDate, endDate string) []MissingHours {
+func getDayHours(loggedHours Response) []DayHours {
+	totalDayHours := []DayHours{}
+	isDateExisting := false
+	for _, loggedHour := range loggedHours.TimeEntries {
+		if len(totalDayHours) == 0 {
+			totalDayHours = append(totalDayHours, DayHours{Date: loggedHour.Date, HoursDecimal: loggedHour.HoursDecimal})
+			continue
+		}
+
+		isDateExisting = false
+		for index, totalDayHour := range totalDayHours {
+			if areDatesTheSame(loggedHour.Date, totalDayHour.Date) {
+				isDateExisting = true
+				totalDayHours[index].HoursDecimal += loggedHour.HoursDecimal
+				break
+			}
+		}
+
+		if !isDateExisting {
+			totalDayHours = append(totalDayHours, DayHours{Date: loggedHour.Date, HoursDecimal: loggedHour.HoursDecimal})
+		}
+	}
+
+	return totalDayHours
+}
+
+func ValidateMissingHours(loggedHours Response, includeCroHolidays bool, startDate, endDate string) []DayHours {
 	workDays, err := prepareWorkDays(startDate, endDate, includeCroHolidays)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 		os.Exit(1)
 	}
 
-	totalMissingHours := []MissingHours{}
+	loggedHoursPerDay := getDayHours(loggedHours)
+
+	totalMissingHours := []DayHours{}
 	areHoursLogged := false
 
 	for _, workDay := range *workDays {
-		for _, loggedHour := range loggedHours.TimeEntries {
-			areHoursLogged = false
-			y1, m1, d1 := workDay.Date()
-			y2, m2, d2 := loggedHour.Date.Date()
 
-			if y1 == y2 && m1 == m2 && d1 == d2 {
+		for _, loggedHour := range loggedHoursPerDay {
+			areHoursLogged = false
+
+			if areDatesTheSame(workDay, loggedHour.Date) {
 				areHoursLogged = true
 				if loggedHour.HoursDecimal < minimumWorkingHours {
 					hoursDif := minimumWorkingHours - loggedHour.HoursDecimal
-					totalMissingHours = append(totalMissingHours, MissingHours{Date: workDay, HoursDecimal: hoursDif})
+					totalMissingHours = append(totalMissingHours, DayHours{Date: workDay, HoursDecimal: hoursDif})
 				}
+				break
 			}
 		}
 
 		if !areHoursLogged {
-			totalMissingHours = append(totalMissingHours, MissingHours{Date: workDay, HoursDecimal: minimumWorkingHours})
+			totalMissingHours = append(totalMissingHours, DayHours{Date: workDay, HoursDecimal: minimumWorkingHours})
 		}
 	}
 

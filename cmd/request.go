@@ -35,8 +35,7 @@ type LogResponse struct {
 }
 
 type CroatianNoneWorkingDays []struct {
-	EndDate   string `json:"endDate"`
-	StartDate string `json:"startDate"`
+	Date string `json:"date"`
 }
 
 func prepareAuthHeader(token string) string {
@@ -176,8 +175,8 @@ func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool
 	return true, nil
 }
 
-func getCroatianNoneWorkingDays(startDate, endDate string) (*CroatianNoneWorkingDays, error) {
-	url := fmt.Sprintf("https://openholidaysapi.org/PublicHolidays?countryIsoCode=HR&languageIsoCode=EN&validFrom=%s&validTo=%s", startDate, endDate)
+func getCroatianNoneWorkingDays(year int) (*CroatianNoneWorkingDays, error) {
+	url := fmt.Sprintf("https://date.nager.at/api/v3/publicholidays/%d/HR", year)
 
 	responseBody, err := handler(url, "GET", "", nil)
 	if err != nil {

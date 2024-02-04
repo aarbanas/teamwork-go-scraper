@@ -78,7 +78,7 @@ func removeNoneWorkingDays(workDays *[]time.Time, nonWorkingDays *CroatianNoneWo
 
 	for index, workday := range *workDays {
 		for _, nonWorkingDay := range *nonWorkingDays {
-			if workday.Format(time.DateOnly) == nonWorkingDay.StartDate {
+			if workday.Format(time.DateOnly) == nonWorkingDay.Date {
 				*workDays = append((*workDays)[:index], (*workDays)[index+1:]...)
 			}
 		}
@@ -99,7 +99,7 @@ func prepareWorkDays(startDate, endDate string, includeCroHolidays bool) (*[]tim
 	workDays := getWorkingDays(workingStartDate, workingEndDate)
 
 	if includeCroHolidays {
-		croNoWorkingDays, err := getCroatianNoneWorkingDays(startDate, endDate)
+		croNoWorkingDays, err := getCroatianNoneWorkingDays(workingStartDate.Year())
 		if err != nil {
 			return nil, err
 		}
@@ -111,4 +111,11 @@ func prepareWorkDays(startDate, endDate string, includeCroHolidays bool) (*[]tim
 	}
 
 	return &workDays, nil
+}
+
+func areDatesTheSame(date1, date2 time.Time) bool {
+	y1, m1, d1 := date1.Date()
+	y2, m2, d2 := date2.Date()
+
+	return y1 == y2 && m1 == m2 && d1 == d2
 }
