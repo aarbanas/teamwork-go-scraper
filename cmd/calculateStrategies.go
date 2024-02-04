@@ -8,7 +8,6 @@ type Strategy interface {
 }
 
 /* ------------------- Tag concrete implementation------------------- */
-// AddStrategy is one implementation of the Strategy interface.
 type CalculateByTag struct{}
 
 func (a *CalculateByTag) CalculateHours(result *Response, value string) float64 {
@@ -25,7 +24,6 @@ func (a *CalculateByTag) CalculateHours(result *Response, value string) float64 
 }
 
 /* ------------------- ProjectId concrete implementation------------------- */
-// SubtractStrategy is another implementation of the Strategy interface.
 type CalculateByProjectId struct{}
 
 func (s *CalculateByProjectId) CalculateHours(result *Response, value string) float64 {
