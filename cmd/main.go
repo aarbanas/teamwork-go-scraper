@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 func main() {
@@ -20,6 +21,7 @@ func main() {
 	log := flag.Bool("l", false, "Enter the logging mode (default: reading logged hours)")
 	projectMode := flag.Bool("p", false, "If selected hours will be logged by project id (default: log by task id )")
 	includeCroatianHolidays := flag.Bool("h", true, "Use for excluding Croatian national holidays from calculations")
+	checkMissingHours := flag.Bool("c", false, "Use for checking if there are some days where hours are not logged")
 
 	flag.Parse()
 
@@ -28,13 +30,25 @@ func main() {
 
 	if *log {
 		logHours(*startDate, *endDate, *projectMode, configuration, *includeCroatianHolidays)
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	// Send request to Teamwork
 	response, responseError := getTimeLogs(*startDate, *endDate, configuration)
 	if responseError != nil {
 		os.Exit(1)
+	}
+
+	if *checkMissingHours {
+		missingHours := ValidateMissingHours(*response, *includeCroatianHolidays, *startDate, *endDate)
+		if len(missingHours) > 0 {
+			for _, missingHour := range missingHours {
+				fmt.Printf("Missing \"%.1f\" hours for date \"%s\"\n", missingHour.HoursDecimal, missingHour.Date.Format(time.DateOnly))
+			}
+		} else {
+			fmt.Println("All hours logged correctly!")
+		}
+		os.Exit(0)
 	}
 
 	hours := 0.0

@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 )
 
 type Tag struct {
@@ -20,9 +21,10 @@ type Tag struct {
 
 type Response struct {
 	TimeEntries []struct {
-		HoursDecimal float64 `json:"hoursDecimal"`
-		ProjectID    int     `json:"projectId"`
-		Tags         []Tag   `json:"tags"`
+		HoursDecimal float64   `json:"hoursDecimal"`
+		ProjectID    int       `json:"projectId"`
+		Tags         []Tag     `json:"tags"`
+		Date         time.Time `json:"date"`
 	} `json:"timeEntries"`
 }
 
