@@ -19,6 +19,7 @@ func main() {
 
 	log := flag.Bool("l", false, "Enter the logging mode (default: reading logged hours)")
 	projectMode := flag.Bool("p", false, "If selected hours will be logged by project id (default: log by task id )")
+	includeCroatianHolidays := flag.Bool("h", true, "Use for excluding Croatian national holidays from calculations")
 
 	flag.Parse()
 
@@ -26,7 +27,7 @@ func main() {
 	validateInputParams(*action, *startDate, *endDate)
 
 	if *log {
-		logHours(*startDate, *endDate, *projectMode, configuration)
+		logHours(*startDate, *endDate, *projectMode, configuration, *includeCroatianHolidays)
 		os.Exit(1)
 	}
 
