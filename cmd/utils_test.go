@@ -94,3 +94,53 @@ func TestGetWorkingDays(t *testing.T) {
 		}
 	}
 }
+
+func TestRemoveNonWorkingDays(t *testing.T) {
+	workdays := []time.Time{
+		time.Date(2023, 3, 12, 0, 0, 0, 0, time.UTC),
+		time.Date(2023, 3, 13, 0, 0, 0, 0, time.UTC),
+		time.Date(2023, 3, 14, 0, 0, 0, 0, time.UTC),
+		time.Date(2023, 3, 15, 0, 0, 0, 0, time.UTC),
+	}
+
+	var nonWorkingDays CroatianNoneWorkingDays
+	nonWorkingDays = append(nonWorkingDays, struct {
+		Date string `json:"date"`
+	}{
+		Date: "2023-03-14",
+	})
+
+	// call the function
+	removeNoneWorkingDays(&workdays, &nonWorkingDays)
+
+	if len(workdays) != 3 {
+		t.Errorf("Expected 3 workdays left, but got %d", len(workdays))
+	}
+}
+
+func TestAreDatesTheSame(t *testing.T) {
+	tests := []struct {
+		date1    time.Time
+		date2    time.Time
+		expected bool
+	}{
+		{
+			date1:    time.Date(2022, time.January, 1, 0, 0, 0, 0, time.UTC),
+			date2:    time.Date(2022, time.January, 1, 0, 0, 0, 0, time.UTC),
+			expected: true,
+		},
+		{
+			date1:    time.Date(2022, time.January, 1, 0, 0, 0, 0, time.UTC),
+			date2:    time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
+			expected: false,
+		},
+		// Add more test cases as needed
+	}
+
+	for _, test := range tests {
+		result := areDatesTheSame(test.date1, test.date2)
+		if result != test.expected {
+			t.Errorf("For dates %v and %v, expected %t, but got %t", test.date1, test.date2, test.expected, result)
+		}
+	}
+}

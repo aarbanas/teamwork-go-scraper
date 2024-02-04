@@ -65,25 +65,20 @@ func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, c
 	return &timeLogs
 }
 
-func logHours(startDate string, endDate string, projectMode bool, configuration Config) {
-	logMetadata, prepareDateErr := prepareData(projectMode)
-	if prepareDateErr != nil {
-		fmt.Printf("Error: %s", prepareDateErr)
-	}
-
-	workingStartDate, err := convertStringFormatToDate(startDate)
-	workingEndDate, _err := convertStringFormatToDate(endDate)
-	if err != nil || _err != nil {
+func logHours(startDate string, endDate string, projectMode bool, configuration Config, includeCroHolidays bool) {
+	logMetadata, err := prepareData(projectMode)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
 		os.Exit(1)
 	}
 
-	workDays := getWorkingDays(workingStartDate, workingEndDate)
-	if len(workDays) < 1 {
-		fmt.Println("There are no workdays in selected period")
+	workDays, err := prepareWorkDays(startDate, endDate, includeCroHolidays)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
 		os.Exit(1)
 	}
 
-	timeLogs := prepareDataForRequest(workDays, logMetadata, &configuration)
+	timeLogs := prepareDataForRequest(*workDays, logMetadata, &configuration)
 	if len(*timeLogs) < 1 {
 		fmt.Println("There are no time logs")
 		os.Exit(1)

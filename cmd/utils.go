@@ -70,3 +70,52 @@ func getWorkingDays(startDate, endDate time.Time) []time.Time {
 	}
 	return workdays
 }
+
+func removeNoneWorkingDays(workDays *[]time.Time, nonWorkingDays *CroatianNoneWorkingDays) {
+	if nonWorkingDays == nil || len(*workDays) < 1 {
+		return
+	}
+
+	for index, workday := range *workDays {
+		for _, nonWorkingDay := range *nonWorkingDays {
+			if workday.Format(time.DateOnly) == nonWorkingDay.Date {
+				*workDays = append((*workDays)[:index], (*workDays)[index+1:]...)
+			}
+		}
+	}
+}
+
+func prepareWorkDays(startDate, endDate string, includeCroHolidays bool) (*[]time.Time, error) {
+	workingStartDate, err := convertStringFormatToDate(startDate)
+	if err != nil {
+		return nil, err
+	}
+
+	workingEndDate, err := convertStringFormatToDate(endDate)
+	if err != nil {
+		return nil, err
+	}
+
+	workDays := getWorkingDays(workingStartDate, workingEndDate)
+
+	if includeCroHolidays {
+		croNoWorkingDays, err := getCroatianNoneWorkingDays(workingStartDate.Year())
+		if err != nil {
+			return nil, err
+		}
+		removeNoneWorkingDays(&workDays, croNoWorkingDays)
+	}
+
+	if len(workDays) < 1 {
+		return nil, errors.New("There are no workdays in selected period")
+	}
+
+	return &workDays, nil
+}
+
+func areDatesTheSame(date1, date2 time.Time) bool {
+	y1, m1, d1 := date1.Date()
+	y2, m2, d2 := date2.Date()
+
+	return y1 == y2 && m1 == m2 && d1 == d2
+}
