@@ -69,29 +69,16 @@ func logHours(startDate string, endDate string, projectMode bool, configuration 
 	logMetadata, err := prepareData(projectMode)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
-	}
-
-	workingStartDate, err := convertStringFormatToDate(startDate)
-	workingEndDate, _err := convertStringFormatToDate(endDate)
-	if err != nil || _err != nil {
 		os.Exit(1)
 	}
 
-	workDays := getWorkingDays(workingStartDate, workingEndDate)
-	if len(workDays) < 1 {
-		fmt.Println("There are no workdays in selected period")
+	workDays, err := prepareWorkDays(startDate, endDate, includeCroHolidays)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
 		os.Exit(1)
 	}
 
-	if includeCroHolidays {
-		croNoWorkingDays, err := getCroatianNoneWorkingDays(startDate, endDate)
-		if err != nil {
-			fmt.Printf("Error: %s", err)
-		}
-		removeNoneWorkingDays(&workDays, croNoWorkingDays)
-	}
-
-	timeLogs := prepareDataForRequest(workDays, logMetadata, &configuration)
+	timeLogs := prepareDataForRequest(*workDays, logMetadata, &configuration)
 	if len(*timeLogs) < 1 {
 		fmt.Println("There are no time logs")
 		os.Exit(1)
