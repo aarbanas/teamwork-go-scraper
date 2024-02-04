@@ -25,6 +25,7 @@ $ ./teamwork-go-scraper -help
 5. [Dates](#dates)
 6. [Logging hours](#log-mode)
 7. [Logging example](#example-for-logging-hours-january-2024)
+8. [Holidays](#croatian-national-holidays)
 
 ## For users having Go installed
 
@@ -103,4 +104,21 @@ go run ./cmd -l -p
 
 ```bash
 go run ./cmd -l -p -startDate=2024-01-01 -endDate=2024-01-31
+```
+
+### Croatian national holidays
+
+In case you want to log hours and skip Croatian national holidays use `-h` flag.
+
+```bash
+go run ./cmd -l -h -startDate=2024-01-01 -endDate=2024-01-31
+```
+
+### Check if there are days missing hours
+
+If you want to validate if in the specified period you logged all your hours there is a flag `c` made for that purpose.
+Here you can add Croatian national holidays in the equation.
+
+```bash
+go run ./cmd -c -h -startDate=2024-01-01 -endDate=2024-01-31
 ```
