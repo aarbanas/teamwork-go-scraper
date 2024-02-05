@@ -1,0 +1,17 @@
+name: Build new tag with release
+
+on:
+  push:
+    branches: feat/ci-cd
+
+jobs:
+  tag-and-create-release:
+    name: Tag and create release
+    secrets: inherit
+    uses: "./.github/workflows/_tag_release.yml"
+
+  go-release:
+    name: Create new Go release
+    secrets: inherit
+    needs: [tag-and-create-release]
+    uses: "./.github/workflows/_build_go_binary.yml"
