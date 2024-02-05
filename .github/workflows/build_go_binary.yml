@@ -1,6 +1,8 @@
 name: Release Go project
 
-on: workflow_call
+on:
+  push:
+    tags: "*"
 
 jobs:
   release:
