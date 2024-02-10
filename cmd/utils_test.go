@@ -69,8 +69,8 @@ func TestConvertStringFormatToDate(t *testing.T) {
 }
 
 func TestConvertDateToStringFormat(t *testing.T) {
-	date := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-	stringFormatValue := "2024-01-01"
+	date := time.Date(2024, 12, 31, 0, 0, 0, 0, time.UTC)
+	stringFormatValue := "20241231"
 
 	stringDate := convertDateToString(date)
 	if stringDate != stringFormatValue {
