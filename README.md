@@ -100,6 +100,14 @@ a flag `-p`.
 go run ./cmd -l -p
 ```
 
+### Start time
+
+To specify the start time use the flag `-t`. Time must be provided in format `HH:mm`
+
+```bash
+go run ./cmd -l -t=08:30
+```
+
 ### Example for logging hours January 2024
 
 ```bash
