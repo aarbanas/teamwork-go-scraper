@@ -17,6 +17,7 @@ func main() {
 	value := flag.String("value", "overtime", "Value for the specified action.")
 	startDate := flag.String("startDate", defaultStartDate, "Must be in format YYYY-MM-DD")
 	endDate := flag.String("endDate", defaultEndDate, "Must be in format YYYY-MM-DD")
+	startTime := flag.String("t", "09:00", "Start time when to log hours from (HH:mm)")
 
 	log := flag.Bool("l", false, "Enter the logging mode (default: reading logged hours)")
 	projectMode := flag.Bool("p", false, "If selected hours will be logged by project id (default: log by task id )")
@@ -29,7 +30,7 @@ func main() {
 	validateInputParams(*action, *startDate, *endDate)
 
 	if *log {
-		logHours(*startDate, *endDate, *projectMode, configuration, *includeCroatianHolidays)
+		logHours(*startDate, *endDate, *startTime, *projectMode, *includeCroatianHolidays, configuration)
 		os.Exit(0)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -58,7 +59,7 @@ func convertStringFormatToDate(dateString string) (time.Time, error) {
 }
 
 func convertDateToString(date time.Time) string {
-	return date.Format(time.DateOnly)
+	return strings.ReplaceAll(date.Format(time.DateOnly), "-", "")
 }
 
 func getWorkingDays(startDate, endDate time.Time) []time.Time {

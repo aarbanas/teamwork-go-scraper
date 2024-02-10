@@ -29,9 +29,8 @@ type Response struct {
 }
 
 type LogResponse struct {
-	TimeLog struct {
-		ID int `json:"id"`
-	} `json:"timelog"`
+	Status    string `json:"STATUS"`
+	TimeLogId string `json:"timeLogId"`
 }
 
 type CroatianNoneWorkingDays []struct {
@@ -96,7 +95,7 @@ func handler(url string, requestMethod string, apiKey string, requestBody interf
 func getTimeLogs(startDate string, endDate string, configuration Config) (*Response, error) {
 
 	// URL
-	url := fmt.Sprintf("%s/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, configuration.UserId, startDate, endDate)
+	url := fmt.Sprintf("%s/projects/api/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, configuration.UserId, startDate, endDate)
 
 	responseBody, err := handler(url, "GET", configuration.ApiKey, nil)
 	if err != nil {
@@ -119,28 +118,29 @@ func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool
 	}
 
 	// URL
-	url := fmt.Sprintf("%s/v3/%s/%s/time.json", configuration.Url, urlReference, timeLog.logTimeMetaData.taskId)
-
+	url := fmt.Sprintf("%s/%s/%s/time_entries.json", configuration.Url, urlReference, timeLog.logTimeMetaData.taskId)
 	// JSON body
 	data := struct {
 		TimeLog struct {
 			Hours       int16  `json:"hours"`
 			Minutes     int16  `json:"minutes"`
-			UserID      int    `json:"userId"`
+			UserID      int    `json:"person-id"`
 			Date        string `json:"date"`
 			Time        string `json:"time"`
 			Description string `json:"description"`
 			IsBillable  bool   `json:"isBillable"`
-		} `json:"timelog"`
+			Tag         string `json:"tag"`
+		} `json:"time-entry"`
 	}{
 		TimeLog: struct {
 			Hours       int16  `json:"hours"`
 			Minutes     int16  `json:"minutes"`
-			UserID      int    `json:"userId"`
+			UserID      int    `json:"person-id"`
 			Date        string `json:"date"`
 			Time        string `json:"time"`
 			Description string `json:"description"`
 			IsBillable  bool   `json:"isBillable"`
+			Tag         string `json:"tag"`
 		}{
 			Hours:       timeLog.logTimeMetaData.hours,
 			Minutes:     timeLog.logTimeMetaData.minutes,
@@ -149,6 +149,7 @@ func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool
 			Time:        timeLog.time,
 			Description: timeLog.logTimeMetaData.description,
 			IsBillable:  timeLog.isBillable,
+			Tag:         timeLog.logTimeMetaData.tag,
 		},
 	}
 
@@ -168,7 +169,7 @@ func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool
 		fmt.Println("Can not unmarshal JSON")
 		os.Exit(1)
 	}
-	if result.TimeLog.ID == 0 {
+	if result.TimeLogId == "0" {
 		return false, errors.New("Did not log time for selected date")
 	}
 

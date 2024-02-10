@@ -13,6 +13,7 @@ type LogTimeMetaData struct {
 	hours       int16
 	minutes     int16
 	description string
+	tag         string
 }
 
 type TimeLog struct {
@@ -51,21 +52,27 @@ func prepareData(projectMode bool) (*LogTimeMetaData, error) {
 	// To remove the new line character at the end
 	description = description[:len(description)-1]
 
-	return &LogTimeMetaData{taskId: taskId, hours: hours, minutes: minutes, description: description}, nil
+	readerTag := bufio.NewReader(os.Stdin)
+	fmt.Println("Enter tag (press enter if you want to skip): ")
+	tag, _ := readerTag.ReadString('\n')
+
+	// To remove the new line character at the end
+	tag = tag[:len(tag)-1]
+
+	return &LogTimeMetaData{taskId: taskId, hours: hours, minutes: minutes, description: description, tag: tag}, nil
 }
 
-func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, configuration *Config) *[]TimeLog {
+func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, configuration *Config, startTime string) *[]TimeLog {
 	var timeLogs []TimeLog
-	TIME := "09:00:00"
 	userId, _ := strconv.Atoi(configuration.UserId)
 	for _, workDay := range workDays {
-		timeLogs = append(timeLogs, TimeLog{userId: userId, date: convertDateToString(workDay), time: TIME, isBillable: true, logTimeMetaData: logMetadata})
+		timeLogs = append(timeLogs, TimeLog{userId: userId, date: convertDateToString(workDay), time: startTime, isBillable: true, logTimeMetaData: logMetadata})
 	}
 
 	return &timeLogs
 }
 
-func logHours(startDate string, endDate string, projectMode bool, configuration Config, includeCroHolidays bool) {
+func logHours(startDate, endDate, startTime string, projectMode, includeCroHolidays bool, configuration Config) {
 	logMetadata, err := prepareData(projectMode)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
@@ -78,7 +85,7 @@ func logHours(startDate string, endDate string, projectMode bool, configuration 
 		os.Exit(1)
 	}
 
-	timeLogs := prepareDataForRequest(*workDays, logMetadata, &configuration)
+	timeLogs := prepareDataForRequest(*workDays, logMetadata, &configuration, startTime)
 	if len(*timeLogs) < 1 {
 		fmt.Println("There are no time logs")
 		os.Exit(1)
