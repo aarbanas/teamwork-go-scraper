@@ -26,6 +26,7 @@ $ ./teamwork-go-scraper -help
 6. [Logging hours](#log-mode)
 7. [Logging example](#example-for-logging-hours-january-2024)
 8. [Holidays](#croatian-national-holidays)
+9. [Check logged-in hours](#check-if-there-are-days-missing-hours)
 
 ## For users having Go installed
 
@@ -65,7 +66,7 @@ go run ./cmd -action=projectId
 
 ### Value
 
-You can pass any `value` which needs to be in the combination with `action`. Default value is `overtime`.
+You can pass any `-value` which needs to be in the combination with `-action`. Default value is `overtime`.
 
 ```bash
 go run ./cmd -action=projectId -value=123456789
@@ -75,8 +76,8 @@ go run ./cmd -action=projectId -value=123456789
 
 For dates two values can be used:
 
-1. `startDate` - default is first day of the current month (must be in format YYYY-MM-DD)
-2. `endDate` - default is today (must be in format YYYY-MM-DD)
+1. `-startDate` - default is first day of the current month (must be in format YYYY-MM-DD)
+2. `-endDate` - default is today (must be in format YYYY-MM-DD)
 
 ```bash
 go run ./cmd -startDate=2024-01-01 -endDate=2024-01-15
@@ -124,7 +125,7 @@ go run ./cmd -l -h -startDate=2024-01-01 -endDate=2024-01-31
 
 ### Check if there are days missing hours
 
-If you want to validate if in the specified period you logged all your hours there is a flag `c` made for that purpose.
+If you want to validate if in the specified period you logged all your hours there is a flag `-c` made for that purpose.
 Here you can add Croatian national holidays in the equation.
 
 ```bash
