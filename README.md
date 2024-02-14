@@ -4,10 +4,16 @@ Simple Go application for calculating hours logged and logging time in Teamwork.
 
 This app can be used without any dependencies.
 Download latest version from [releases](https://github.com/aarbanas/teamwork-go-scraper/releases) and add `config.json` (check the [config.json-example](https://github.com/aarbanas/teamwork-go-scraper/blob/main/config.json-example)) to the
-same directory where the downloaded binary file is. Than just run:
+same directory where the downloaded binary file is. Than just run on UNIX:
 
 ```bash
 $ ./teamwork-go-scraper
+```
+
+For Windows users
+
+```powershell
+$ .\teamwork-go-scraper.exe
 ```
 
 For help run:
@@ -17,9 +23,9 @@ $ ./teamwork-go-scraper -help
 
 -action string
      Action on which hours will be calculated (tag or projectId) (default "tag")
--endDate string
-     Must be in format YYYY-MM-DD (default "first day of current month (e.g. 2024-01-01)")
 -startDate string
+     Must be in format YYYY-MM-DD (default "first day of current month (e.g. 2024-01-01)")
+-endDate string
      Must be in format YYYY-MM-DD (default "today (e.g. 2024-01-15)")
 -t string
      Start time when to log hours from (HH:mm) (default "09:00")
