@@ -129,7 +129,7 @@ func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool
 			Time        string `json:"time"`
 			Description string `json:"description"`
 			IsBillable  bool   `json:"isBillable"`
-			Tag         string `json:"tag"`
+			Tag         string `json:"tags"`
 		} `json:"time-entry"`
 	}{
 		TimeLog: struct {
@@ -140,7 +140,7 @@ func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool
 			Time        string `json:"time"`
 			Description string `json:"description"`
 			IsBillable  bool   `json:"isBillable"`
-			Tag         string `json:"tag"`
+			Tag         string `json:"tags"`
 		}{
 			Hours:       timeLog.logTimeMetaData.hours,
 			Minutes:     timeLog.logTimeMetaData.minutes,
