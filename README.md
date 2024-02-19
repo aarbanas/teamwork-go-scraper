@@ -21,21 +21,19 @@ For help run:
 ```bash
 $ ./teamwork-go-scraper -help
 
--action string
-     Action on which hours will be calculated (tag or projectId) (default "tag")
--startDate string
-     Must be in format YYYY-MM-DD (default "first day of current month (e.g. 2024-01-01)")
--endDate string
-     Must be in format YYYY-MM-DD (default "today (e.g. 2024-01-15)")
--t string
-     Start time when to log hours from (HH:mm) (default "09:00")
--value string
-     Value for the specified action. (default "overtime")
--c   Use for checking if there are some days where hours are not logged
--h   Use for including Croatian national holidays in the calculations
--l   Enter the logging mode (default: reading logged hours)
--p   If selected hours will be logged by project id (default: log by task id )
+# String flags (must specify value -action=tag)
+-action        Action on which hours will be calculated (tag or projectId) (default "tag")
+-startDate     Must be in format YYYY-MM-DD (default "first day of current month (e.g. 2024-01-01)")
+-endDate       Must be in format YYYY-MM-DD (default "today (e.g. 2024-01-15)")
+-t             Start time when to log hours from (HH:mm) (default "09:00")
+-value         Value for the specified action. (default "overtime")
 
+# Boolean flags (just passed as arguments)
+-c             Use for checking if there are some days where hours are not logged
+-h             Use for including Croatian national holidays in the calculations
+-l             Enter the logging mode (default: reading logged hours)
+-p             If selected hours will be logged by project id (default: log by task id )
+-n             Non billable hours in log mode (default: isBillable)
 ```
 
 # Table of Contents
