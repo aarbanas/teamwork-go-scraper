@@ -62,17 +62,17 @@ func prepareData(projectMode bool) (*LogTimeMetaData, error) {
 	return &LogTimeMetaData{taskId: taskId, hours: hours, minutes: minutes, description: description, tag: tag}, nil
 }
 
-func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, configuration *Config, startTime string) *[]TimeLog {
+func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, configuration *Config, startTime string, nonBillable bool) *[]TimeLog {
 	var timeLogs []TimeLog
 	userId, _ := strconv.Atoi(configuration.UserId)
 	for _, workDay := range workDays {
-		timeLogs = append(timeLogs, TimeLog{userId: userId, date: convertDateToString(workDay), time: startTime, isBillable: true, logTimeMetaData: logMetadata})
+		timeLogs = append(timeLogs, TimeLog{userId: userId, date: convertDateToString(workDay), time: startTime, isBillable: !nonBillable, logTimeMetaData: logMetadata})
 	}
 
 	return &timeLogs
 }
 
-func logHours(startDate, endDate, startTime string, projectMode, includeCroHolidays bool, configuration Config) {
+func logHours(startDate, endDate, startTime string, projectMode, includeCroHolidays, nonBillable bool, configuration Config) {
 	logMetadata, err := prepareData(projectMode)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
@@ -85,7 +85,7 @@ func logHours(startDate, endDate, startTime string, projectMode, includeCroHolid
 		os.Exit(1)
 	}
 
-	timeLogs := prepareDataForRequest(*workDays, logMetadata, &configuration, startTime)
+	timeLogs := prepareDataForRequest(*workDays, logMetadata, &configuration, startTime, nonBillable)
 	if len(*timeLogs) < 1 {
 		fmt.Println("There are no time logs")
 		os.Exit(1)
