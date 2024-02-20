@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -91,13 +92,26 @@ func logHours(startDate, endDate, startTime string, projectMode, includeCroHolid
 		os.Exit(1)
 	}
 
+	wg := sync.WaitGroup{}
 	for _, timeLog := range *timeLogs {
-		_, errResponse := postTimeLogs(timeLog, projectMode, configuration)
-		if errResponse != nil {
-			fmt.Printf("Error sending request for date: %s\n", timeLog.date)
-			fmt.Printf("Error %v", errResponse)
-		} else {
-			fmt.Printf("Successfully logged time for date: %s\n", timeLog.date)
-		}
+		wg.Add(1)
+		go func(timeLog TimeLog) {
+			date, err := time.Parse("20060102", timeLog.date)
+			if err != nil {
+				fmt.Println("Error parsing date:", err)
+				return
+			}
+			formattedDate := date.Format(time.DateOnly)
+
+			_, errResponse := postTimeLogs(timeLog, projectMode, configuration)
+			if errResponse != nil {
+				fmt.Printf("Error sending request for date: %s\n", formattedDate)
+				fmt.Printf("Error %v", errResponse)
+			} else {
+				fmt.Printf("Successfully logged time for date: %s\n", formattedDate)
+			}
+			wg.Done()
+		}(timeLog)
 	}
+	wg.Wait()
 }
