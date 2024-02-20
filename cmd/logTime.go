@@ -53,7 +53,7 @@ func prepareData(projectMode bool) (*LogTimeMetaData, error) {
 	description = description[:len(description)-1]
 
 	readerTag := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter tag (press enter if you want to skip): ")
+	fmt.Println("Enter tags separated with comma (press enter if you want to skip): ")
 	tag, _ := readerTag.ReadString('\n')
 
 	// To remove the new line character at the end
