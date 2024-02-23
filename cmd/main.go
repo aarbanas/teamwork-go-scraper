@@ -6,12 +6,14 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/aarbanas/teamwork-go-scraper/config"
 )
 
 func main() {
 	defaultStartDate, defaultEndDate := getDefaultDates()
 	absPath, _ := filepath.Abs("config.json")
-	configuration := loadConfiguration(absPath)
+	configuration := config.LoadConfiguration(absPath)
 
 	action := flag.String("action", "tag", "Action on which hours will be calculated (tag or projectId)")
 	value := flag.String("value", "overtime", "Value for the specified action.")

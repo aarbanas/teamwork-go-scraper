@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/aarbanas/teamwork-go-scraper/config"
 )
 
 type LogTimeMetaData struct {
@@ -63,7 +65,7 @@ func prepareData(projectMode bool) (*LogTimeMetaData, error) {
 	return &LogTimeMetaData{taskId: taskId, hours: hours, minutes: minutes, description: description, tag: tag}, nil
 }
 
-func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, configuration *Config, startTime string, nonBillable bool) *[]TimeLog {
+func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, configuration *config.Config, startTime string, nonBillable bool) *[]TimeLog {
 	var timeLogs []TimeLog
 	userId, _ := strconv.Atoi(configuration.UserId)
 	for _, workDay := range workDays {
@@ -73,7 +75,7 @@ func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, c
 	return &timeLogs
 }
 
-func logHours(startDate, endDate, startTime string, projectMode, includeCroHolidays, nonBillable bool, configuration Config) {
+func logHours(startDate, endDate, startTime string, projectMode, includeCroHolidays, nonBillable bool, configuration config.Config) {
 	logMetadata, err := prepareData(projectMode)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
