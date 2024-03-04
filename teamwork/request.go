@@ -1,4 +1,4 @@
-package main
+package teamwork
 
 import (
 	"bytes"
@@ -94,7 +94,7 @@ func handler(url string, requestMethod string, apiKey string, requestBody interf
 	return &responseBody, nil
 }
 
-func getTimeLogs(startDate string, endDate string, configuration config.Config) (*Response, error) {
+func GetTimeLogs(startDate string, endDate string, configuration config.Config) (*Response, error) {
 
 	// URL
 	url := fmt.Sprintf("%s/projects/api/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, configuration.UserId, startDate, endDate)

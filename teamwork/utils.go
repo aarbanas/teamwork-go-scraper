@@ -1,4 +1,4 @@
-package main
+package teamwork
 
 import (
 	"errors"
@@ -21,7 +21,7 @@ func validateDate(date string) bool {
 	return err == nil
 }
 
-func validateInputParams(action string, startDate string, endDate string) {
+func ValidateInputParams(action string, startDate string, endDate string) {
 	if err := validateAction(action); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
@@ -38,7 +38,7 @@ func validateInputParams(action string, startDate string, endDate string) {
 	}
 }
 
-func getDefaultDates() (string, string) {
+func GetDefaultDates() (string, string) {
 	now := time.Now().UTC()
 	currentYear, currentMonth, _ := now.Date()
 	currentLocation := now.Location()

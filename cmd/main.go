@@ -8,10 +8,11 @@ import (
 	"time"
 
 	"github.com/aarbanas/teamwork-go-scraper/config"
+	"github.com/aarbanas/teamwork-go-scraper/teamwork"
 )
 
 func main() {
-	defaultStartDate, defaultEndDate := getDefaultDates()
+	defaultStartDate, defaultEndDate := teamwork.GetDefaultDates()
 	absPath, _ := filepath.Abs("config.json")
 	configuration := config.LoadConfiguration(absPath)
 
@@ -30,21 +31,21 @@ func main() {
 	flag.Parse()
 
 	// Validate command-line arguments
-	validateInputParams(*action, *startDate, *endDate)
+	teamwork.ValidateInputParams(*action, *startDate, *endDate)
 
 	if *log {
-		logHours(*startDate, *endDate, *startTime, *projectMode, *includeCroatianHolidays, *nonBillable, configuration)
+		teamwork.LogHours(*startDate, *endDate, *startTime, *projectMode, *includeCroatianHolidays, *nonBillable, configuration)
 		os.Exit(0)
 	}
 
 	// Send request to Teamwork
-	response, responseError := getTimeLogs(*startDate, *endDate, configuration)
+	response, responseError := teamwork.GetTimeLogs(*startDate, *endDate, configuration)
 	if responseError != nil {
 		os.Exit(1)
 	}
 
 	if *checkMissingHours {
-		missingHours := ValidateMissingHours(*response, *includeCroatianHolidays, *startDate, *endDate)
+		missingHours := teamwork.ValidateMissingHours(*response, *includeCroatianHolidays, *startDate, *endDate)
 		if len(missingHours) > 0 {
 			for _, missingHour := range missingHours {
 				fmt.Printf("Missing \"%.1f\" hours for date \"%s\"\n", missingHour.HoursDecimal, missingHour.Date.Format(time.DateOnly))
@@ -58,11 +59,11 @@ func main() {
 	hours := 0.0
 	switch *action {
 	case "tag":
-		context := NewContext(&CalculateByTag{})
+		context := teamwork.NewContext(&teamwork.CalculateByTag{})
 		result := context.ExecuteStrategy(response, *value)
 		hours = result
 	case "projectId":
-		context := NewContext(&CalculateByProjectId{})
+		context := teamwork.NewContext(&teamwork.CalculateByProjectId{})
 		result := context.ExecuteStrategy(response, *value)
 		hours = result
 	}
