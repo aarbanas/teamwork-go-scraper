@@ -1,4 +1,4 @@
-package main
+package teamwork
 
 import (
 	"bufio"
@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/aarbanas/teamwork-go-scraper/config"
 )
 
 type LogTimeMetaData struct {
@@ -35,14 +37,14 @@ func prepareData(projectMode bool) (*LogTimeMetaData, error) {
 	}
 
 	fmt.Printf("Enter %s: \n", hoursReference)
-	_, taskError := fmt.Scan(&taskId)
-	if taskError != nil {
-		return nil, taskError
+	_, err := fmt.Scan(&taskId)
+	if err != nil {
+		return nil, err
 	}
 
 	fmt.Println("Enter hours and minutes (separate with space): ")
 	_, hoursMinutesError := fmt.Scan(&hours, &minutes)
-	if taskError != nil {
+	if hoursMinutesError != nil {
 		return nil, hoursMinutesError
 	}
 
@@ -63,7 +65,7 @@ func prepareData(projectMode bool) (*LogTimeMetaData, error) {
 	return &LogTimeMetaData{taskId: taskId, hours: hours, minutes: minutes, description: description, tag: tag}, nil
 }
 
-func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, configuration *Config, startTime string, nonBillable bool) *[]TimeLog {
+func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, configuration *config.Config, startTime string, nonBillable bool) *[]TimeLog {
 	var timeLogs []TimeLog
 	userId, _ := strconv.Atoi(configuration.UserId)
 	for _, workDay := range workDays {
@@ -73,7 +75,7 @@ func prepareDataForRequest(workDays []time.Time, logMetadata *LogTimeMetaData, c
 	return &timeLogs
 }
 
-func logHours(startDate, endDate, startTime string, projectMode, includeCroHolidays, nonBillable bool, configuration Config) {
+func LogHours(startDate, endDate, startTime string, projectMode, includeCroHolidays, nonBillable bool, configuration config.Config) {
 	logMetadata, err := prepareData(projectMode)
 	if err != nil {
 		fmt.Printf("Error: %s", err)

@@ -1,4 +1,4 @@
-package main
+package teamwork
 
 import (
 	"bytes"
@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/aarbanas/teamwork-go-scraper/config"
 )
 
 type Tag struct {
@@ -92,7 +94,7 @@ func handler(url string, requestMethod string, apiKey string, requestBody interf
 	return &responseBody, nil
 }
 
-func getTimeLogs(startDate string, endDate string, configuration Config) (*Response, error) {
+func GetTimeLogs(startDate string, endDate string, configuration config.Config) (*Response, error) {
 
 	// URL
 	url := fmt.Sprintf("%s/projects/api/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, configuration.UserId, startDate, endDate)
@@ -111,7 +113,7 @@ func getTimeLogs(startDate string, endDate string, configuration Config) (*Respo
 	return &result, nil
 }
 
-func postTimeLogs(timeLog TimeLog, projectMode bool, configuration Config) (bool, error) {
+func postTimeLogs(timeLog TimeLog, projectMode bool, configuration config.Config) (bool, error) {
 	urlReference := "tasks"
 	if projectMode {
 		urlReference = "projects"
