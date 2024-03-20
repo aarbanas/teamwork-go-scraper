@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	UserId string `json:"userId"`
-	ApiKey string `json:"apiKey"`
-	Url    string `json:"url"`
+	UserId  string `json:"userId"`
+	ApiKey  string `json:"apiKey"`
+	Url     string `json:"url"`
+	UserIds []string
 }
 
 func LoadConfiguration(file string) Config {

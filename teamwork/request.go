@@ -23,10 +23,12 @@ type Tag struct {
 
 type Response struct {
 	TimeEntries []struct {
-		HoursDecimal float64   `json:"hoursDecimal"`
-		ProjectID    int       `json:"projectId"`
-		Tags         []Tag     `json:"tags"`
-		Date         time.Time `json:"date"`
+		HoursDecimal  float64   `json:"hoursDecimal"`
+		ProjectID     int       `json:"projectId"`
+		Tags          []Tag     `json:"tags"`
+		Date          time.Time `json:"date"`
+		UserFirstName string    `json:"userFirstName"`
+		UserLastName  string    `json:"userLastName"`
 	} `json:"timeEntries"`
 }
 
@@ -94,10 +96,16 @@ func handler(url string, requestMethod string, apiKey string, requestBody interf
 	return &responseBody, nil
 }
 
-func GetTimeLogs(startDate string, endDate string, configuration config.Config) (*Response, error) {
+func GetTimeLogs(startDate string, endDate string, configuration config.Config, ids ...string) (*Response, error) {
+	var userId string
+	if len(ids) > 0 {
+		userId = ids[0]
+	} else {
+		userId = configuration.UserId
+	}
 
 	// URL
-	url := fmt.Sprintf("%s/projects/api/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, configuration.UserId, startDate, endDate)
+	url := fmt.Sprintf("%s/projects/api/v2/time.json?page=1&pageSize=50&getTotals=true&userId=%s&fromDate=%s&toDate=%s&sortBy=date&sortOrder=desc&matchAllTags=true", configuration.Url, userId, startDate, endDate)
 
 	responseBody, err := handler(url, "GET", configuration.ApiKey, nil)
 	if err != nil {
