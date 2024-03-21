@@ -27,11 +27,17 @@ func main() {
 	includeCroatianHolidays := flag.Bool("h", false, "Use for including Croatian national holidays in the calculations")
 	checkMissingHours := flag.Bool("c", false, "Use for checking if there are some days where hours are not logged")
 	nonBillable := flag.Bool("n", false, "Non billable hours in log mode (default: isBillable)")
+	teamHours := flag.Bool("m", false, "Check time logs for team members")
 
 	flag.Parse()
 
 	// Validate command-line arguments
 	teamwork.ValidateInputParams(*action, *startDate, *endDate)
+
+	if *teamHours {
+		teamwork.CheckTeamMembersHours(configuration, *includeCroatianHolidays, *startDate, *endDate)
+		os.Exit(0)
+	}
 
 	if *log {
 		teamwork.LogHours(*startDate, *endDate, *startTime, *projectMode, *includeCroatianHolidays, *nonBillable, configuration)
@@ -39,12 +45,16 @@ func main() {
 	}
 
 	// Send request to Teamwork
-	response, responseError := teamwork.GetTimeLogs(*startDate, *endDate, configuration)
-	if responseError != nil {
+	response, err := teamwork.GetTimeLogs(*startDate, *endDate, configuration)
+	if err != nil {
 		os.Exit(1)
 	}
 
 	if *checkMissingHours {
+		if len(response.TimeEntries) == 0 {
+			fmt.Println("No time entries found")
+		}
+
 		missingHours := teamwork.ValidateMissingHours(*response, *includeCroatianHolidays, *startDate, *endDate)
 		if len(missingHours) > 0 {
 			for _, missingHour := range missingHours {
