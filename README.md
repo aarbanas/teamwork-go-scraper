@@ -3,8 +3,7 @@
 Simple Go application for calculating hours logged and logging time in Teamwork.
 
 This app can be used without any dependencies.
-Download latest version from [releases](https://github.com/aarbanas/teamwork-go-scraper/releases) and add `config.json` (check the [config.json-example](https://github.com/aarbanas/teamwork-go-scraper/blob/main/config.json-example)) to the
-same directory where the downloaded binary file is. Than just run on UNIX:
+Here is the [documentation]() on how to setup the app. Than just run on UNIX:
 
 ```bash
 $ ./teamwork-go-scraper
@@ -34,6 +33,7 @@ $ ./teamwork-go-scraper -help
 -l             Enter the logging mode (default: reading logged hours)
 -p             If selected hours will be logged by project id (default: log by task id )
 -n             Non billable hours in log mode (default: isBillable)
+-m             Check time logs for team members
 ```
 
 # Table of Contents

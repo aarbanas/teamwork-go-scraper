@@ -27,7 +27,7 @@ func main() {
 	includeCroatianHolidays := flag.Bool("h", false, "Use for including Croatian national holidays in the calculations")
 	checkMissingHours := flag.Bool("c", false, "Use for checking if there are some days where hours are not logged")
 	nonBillable := flag.Bool("n", false, "Non billable hours in log mode (default: isBillable)")
-	teamHours := flag.Bool("th", false, "Check time logs for team members")
+	teamHours := flag.Bool("m", false, "Check time logs for team members")
 
 	flag.Parse()
 
