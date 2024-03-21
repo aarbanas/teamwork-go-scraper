@@ -3,7 +3,7 @@
 Simple Go application for calculating hours logged and logging time in Teamwork.
 
 This app can be used without any dependencies.
-Here is the [documentation]() on how to setup the app. Than just run on UNIX:
+Here is the [documentation](https://github.com/aarbanas/teamwork-go-scraper/tree/main/docu) on how to setup the app. Than just run on UNIX:
 
 ```bash
 $ ./teamwork-go-scraper
